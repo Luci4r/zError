@@ -2,10 +2,10 @@ package zError
 
 import "math"
 
-type zError interface {
+type ZError interface {
 	ErrCode() int64
 	ErrStr() string
-	New(string) zError
+	New(string) ZError
 }
 
 type er struct {
@@ -21,7 +21,7 @@ func (this *er) ErrStr() string {
 	return this.errString
 }
 
-func (this *er) New(s string) zError {
+func (this *er) New(s string) ZError {
 	e := new(er)
 	if s == "" {
 		e.errString = this.errString
@@ -32,12 +32,12 @@ func (this *er) New(s string) zError {
 	return e
 }
 
-var ErrCodeList map[int64]zError
+var ErrCodeList map[int64]ZError
 
-var TypeConflict zError
+var TypeConflict ZError
 
-func SignInzError(t int64, s string) (zError, string) {
-	if s, ok := ErrCodeList[t]; ok {
+func SignInzError(t int64, s string) (ZError, string) {
+	if _, ok := ErrCodeList[t]; ok {
 		return nil, TypeConflict.ErrStr()
 	} else {
 		e := new(er)
@@ -49,6 +49,6 @@ func SignInzError(t int64, s string) (zError, string) {
 }
 
 func init() {
-	ErrCodeList = make(map[int64]string, 10)
-	TypeConflict = SignInzError(math.MaxInt64, "Error Code is Signed aleady")
+	ErrCodeList = make(map[int64]ZError, 10)
+	TypeConflict, _ = SignInzError(math.MaxInt64, "Error Code is Signed aleady")
 }
