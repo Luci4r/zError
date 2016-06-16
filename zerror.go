@@ -1,54 +1,52 @@
 package zError
 
-import "math"
+import (
+	"math"
+)
 
-type ZError interface {
-	ErrCode() int64
-	ErrStr() string
-	New(string) ZError
-}
+//
+//type ZError interface {
+//	ErrCode() int64
+//	ErrStr() string
+//	New(string) ZError
+//}
 
-type er struct {
+type ZError struct {
 	errType   int64
 	errString string
 }
 
-func (this *er) ErrCode() int64 {
+func (this *ZError) ErrCode() int64 {
 	return this.errType
 }
 
-func (this *er) ErrStr() string {
+func (this *ZError) Error() string {
 	return this.errString
 }
 
-func (this *er) New(s string) ZError {
-	e := new(er)
+func (this *ZError) New(s string) *ZError {
 	if s == "" {
-		e.errString = this.errString
+		return this
 	} else {
-		e.errString = s
+		return &ZError{errType: this.errType, errString: s}
 	}
-	e.errType = this.errType
-	return e
 }
 
-var ErrCodeList map[int64]ZError
+var ErrCodeList map[int64]*ZError
 
-var TypeConflict ZError
+var TypeConflict *ZError
 
-func SignInzError(t int64, s string) (ZError, string) {
+func SignInzError(t int64, s string) (*ZError, string) {
 	if _, ok := ErrCodeList[t]; ok {
-		return nil, TypeConflict.ErrStr()
+		return nil, TypeConflict.Error()
 	} else {
-		e := new(er)
-		e.errType = t
-		e.errString = s
-		ErrCodeList[t] = e
-		return e, ""
+		e := ZError{errType: t, errString: s}
+		ErrCodeList[t] = &e
+		return &e, ""
 	}
 }
 
 func init() {
-	ErrCodeList = make(map[int64]ZError, 10)
+	ErrCodeList = make(map[int64]*ZError, 10)
 	TypeConflict, _ = SignInzError(math.MaxInt64, "Error Code is Signed aleady")
 }

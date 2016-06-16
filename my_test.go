@@ -1,6 +1,7 @@
 package zError
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -39,26 +40,23 @@ func TestSignInzError(t *testing.T) {
 			t.Error("Error sign in error ", es)
 			return
 		} else {
-			*(v.errName) = e
+			*(v.errName) = *e
 		}
-		t.Log(e)
-		t.Log(v.errName)
 	}
-	t.Log(ErrTest1)
-	if ErrTest1.ErrCode() != -1 || ErrTest1.ErrStr() != "Error test1" {
+	if ErrTest1.ErrCode() != -1 || ErrTest1.Error() != "Error test1" {
 		t.Error("Error sign in error ")
 		return
 	}
-	if ErrTest2.ErrCode() != -2 || ErrTest2.ErrStr() != "Error test2" {
+	if ErrTest2.ErrCode() != -2 || ErrTest2.Error() != "Error test2" {
 		t.Error("Error sign in error ")
 		return
 	}
-	if ErrTest3.ErrCode() != 1024 || ErrTest3.ErrStr() != "Error test3" {
+	if ErrTest3.ErrCode() != 1024 || ErrTest3.Error() != "Error test3" {
 		t.Error("Error sign in error ")
 		return
 	}
 	net1 := ErrTest1.New("New Error test1")
-	if net1.ErrCode() != ErrTest1.ErrCode() || net1.ErrStr() != "New Error test1" {
+	if net1.ErrCode() != ErrTest1.ErrCode() || net1.Error() != "New Error test1" {
 		t.Error("Error sign in error ")
 		return
 	}
@@ -74,5 +72,19 @@ func TestDuplicateSignInzError(t *testing.T) {
 	if es == "" {
 		t.Error("Error check duplicate sign in")
 		return
+	}
+}
+
+var ErrStr = "Error test"
+
+func BenchmarkEr_ZErrorNew(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ErrTest1.New(ErrStr)
+	}
+}
+
+func BenchmarkEr_ErrorNew(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		errors.New(ErrStr)
 	}
 }
